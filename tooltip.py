@@ -21,7 +21,7 @@ class Tooltip:
 
         self.__top = tk.Toplevel(self.__widget, background="#000000")
         self.__top.overrideredirect(True)
-        l = ttk.Label(self.__top, text=self.__text, style="Tooltip.TLabel")
+        l = tk.Label(self.__top, text=self.__text, bg="#FFFFDC")
         l.pack(padx=1, pady=1, ipadx=1, ipady=1)
 
         self.__top.update()
@@ -29,6 +29,9 @@ class Tooltip:
         x = self.__top.winfo_pointerx()
         y = self.__top.winfo_pointery()
         self.__top.geometry("+%s+%s" % (x, y - h))
+
+        style = ttk.Style(self.__top)
+        style.configure("Tooltip.TLabel", background="#FFFFDC")
 
     def __onEnter(self, *args):
         """
