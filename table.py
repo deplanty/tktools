@@ -356,4 +356,4 @@ class Table(ttk.Frame):
         if len(select) == 0:
             return None
         else:
-            return select[0]
+            return select[0], self.tv.item(select[0], "values")
