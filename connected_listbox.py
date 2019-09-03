@@ -77,23 +77,28 @@ class ConnectedListbox(ttk.Frame):
 
     def get(self):
         """
-        Return (list1, list2)
+        Return the values contained in both lists
+        
+        Returns:
+            tuple: content of list 1 (left)
+            tuple: content of list 2 (right)
         """
 
         return self.__slb1.lb.get(0, "end"), self.__slb2.lb.get(0, "end")
 
-    def clear(self, side):
+    def clear(self, side="both"):
         """
-        Clear a list
+        Clear the listboxes
 
-        Parameters:
-        -----------
-        side : The side to clear = ["right", "left"]
+        Args:
+            side (str) : the side to clear = ["left", "right", "both"]
         """
 
-        if side == "left":
+        if side not in ["left", "right", "both"]:
+            raise ValueError("``side`` should be 'left', 'right' or 'both'")
+
+        if side in ["left", "both"]:
             self.__slb1.lb.delete(0, "end")
-        elif side == "right":
+        
+        if side in ["right", "both"]:
             self.__slb2.lb.delete(0, "end")
-        else:
-            raise ValueError('"side" should be left or right')
