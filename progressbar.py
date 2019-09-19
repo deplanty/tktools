@@ -178,37 +178,67 @@ class Progressbar(tk.Toplevel):
                 self.n.set(kwargs["n_max"])
             self.n_max = kwargs["n_max"]
 
-# class ProgressBar:
-#     def __init__(self, master=None, n_process=1):
-#         self.master = master
-#         self.n_process = n_process
+class ProgressBar:
+    def __init__(self, master=None, n_maxs=1, linked=False):
+        if master is not None:
+            self.f_main = ttk.Frame(master)
+        else:
+            self.f_main = tk.Toplevel()
+        try:
+            self.n_process = len(n_maxs)
+            self.n_maxs = n_maxs
+        except:
+            self.n_process = 1
+            self.n_maxs = [n_maxs]
+        self.linked = linked
 
-#         self.n_tot = 0
-#         self.n_bars = [tk.IntVar(0) for _ in range(n_process)]
-#         self.bars = list()
+        self.n_tot = 0
+        self.n_bars = [tk.IntVar(0) for _ in self.n_maxs]
+        self.bars = list()
 
-#         self.__createUI()
+        self.__createUI()
     
-#     def __createUI(self):
-#         if self.master is not None:
-#             self.f_main = ttk.Frame(self.master)
-#         else:
-#             self.f_main = tk.Toplevel()
+    def __createUI(self):
         
-#         for _ in range(self.n_process):
-#             bar = ttk.Progressbar(self.f_main, orient="horizontal")
-#             bar.pack(fill="x", expand=True, padx=5, pady=5)
-#             self.bars.append(bar)
+        for var, maxi in zip(self.n_bars, self.n_maxs):
+            bar = ttk.Progressbar(self.f_main, orient="horizontal", variable=var, maximum=maxi)
+            bar.pack(fill="x", expand=True, padx=5, pady=5)
+            self.bars.append(bar)
     
-#     def pack(self, **kwargs):
-#         if self.master is not None:
-#             self.f_main.pack(**kwargs)
+    def step(self, bar=0, delta=1):
+        """
+        #TODO: docstring and fix bugs in this function
+        
+        Args:
+            bar (int, optional): corresponding progressbar. Defaults to 0.
+            delta (int, optional): delta value to add to the progressbar. Defaults to 1.
+        """
+
+        # Get current value for the bar
+        n = self.n_bars[bar].get()
+        # If next step is in the range
+        if n+delta <= self.n_maxs[bar]:
+            self.n_bars[bar].set(n+delta)
+        # else
+        else:
+            # If linked
+            if self.linked:
+                # Go backt to 0
+                self.n_bars[bar].set(0)
+                # Add delta to the next bar
+                if bar < self.n_process:
+                    self.step(bar+delta)
+        self.f_main.update()
+    
+    def pack(self, **kwargs):
+        self.f_main.pack(**kwargs)
 
 
 if __name__ == "__main__":
-    # root = tk.Tk()
-    pbar = Progressbar(n_max=100)
-    for x in range(100):
+    import time
+
+    pbar = ProgressBar(n_maxs=[100, 5], linked=True)
+    for x in range(500):
         pbar.step()
-    # pbar.pack()
-    # root.mainloop()
+        time.sleep(0.01)
+    time.sleep(2)
